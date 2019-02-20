@@ -15,7 +15,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('/index', 'MainController@index');
+
 Route::get('/login', 'MainController@login');
 Route::get('/plans', 'MainController@plans');
+
+    Route::post('/index/create_poll', 'MainController@create_poll');
 
 

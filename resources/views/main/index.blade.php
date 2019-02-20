@@ -48,7 +48,11 @@
                       </div>
                       <div class="col-lg-8 col-md-9 col-sm-8 d-flex flex-column align-items-md-start align-items-lg-start align-items-sm-start align-items-center">
                         <p class="database-description">Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptas autem molestias architecto nam dicta ut dolore?</p>
-                        <button class="style-lg-btn">create new poll</button>
+                          <div class="nav nav-tabs d-flex flex-column justify-content-center align-items-center" id="nav-tab" role="tablist">
+                            <a class="nav-item" id="nav-profile-tab" data-toggle="tab" href="#create-poll" role="tab" aria-controls="nav-profile" aria-selected="false">
+                              <button class="style-lg-btn">create new poll</button>
+                            </a>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -82,11 +86,53 @@
                     </div>
                     <div class="d-flex justify-content-xl-start justify-content-lg-start justify-content-md-start justify-content-sm-start justify-content-center">
                         <a href="#">
-                          <button class="link-see-all-posts">See all posts</button>
+                          <button class="link-see-all-posts" data-toggle="modal" data-target="#allPolls">See all posts</button>
                         </a> 
                     </div>
                     
                   </div>
+
+                  <!-- All Polls-->
+
+                  <div class="modal fade" id="allPolls" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div style="max-width: 1200px !important;" class="modal-dialog modal-lg" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">All poll posts</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="app1">
+                                    <div v-for="id in ids" class="form-group">    
+                                        <table class="table table-hover table-bordered">
+
+                                            <thead>
+                                                <tr class="text-center">
+                                                    <th>Name</th>
+                                                    <th>Type</th>
+                                                    <th>Question</th>
+                                                    <th>Audience</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                            @foreach( $all_polls as $all_poll)
+                                                <tr class="text-center">
+                                                  <th>{{ $all_poll->poll_name }}</th>
+                                                  <th>{{ $all_poll->poll_type }}</th>
+                                                  <th>{{ $all_poll->poll_question }}</th>
+                                                  <th>{{ $all_poll->poll_audience }}</th>
+                                                </tr>
+                                            @endforeach                 
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>{{-- /modal-content --}}
+                    </div>{{-- /modal-dialog --}}
+                </div>{{-- /modal fade --}}
       
                   <!--Poll graphs-->
                   <div class="poll-graphs default-white-block">
@@ -96,7 +142,18 @@
                                 <h3>Current active</h3>
                                 <div>
                                     <div class="card-block">
-                                        <div id="bar-chart" class="height-600">                       
+                                        <div id="bar-chart" class="height-600">
+                                          <table>
+                                            <tbody>
+                                            @foreach ($active_polls as $active_poll)
+                                              <tr>
+                                                <th>
+                                                  {{ $active_poll->poll_name }}
+                                                </th>
+                                              </tr>
+                                              @endforeach
+                                            </tbody>
+                                          </table>
                                         </div>
                                     </div>
                                 </div>
@@ -253,15 +310,19 @@
                 <div class="d-flex justify-content-center">
                   <h1>Create new poll</h1>
                 </div>
-                
-                <form id="createNewPollForm" action="">
+
+                {{-- НОВОЕ --}}
+              <form class="form" action="{{ url('/index/create_poll') }}" method="POST">
+                @csrf
                   <div class="container">
+
+                  <input type="hidden" name="poll_status" value="active">
 
                     <!--Name your poll-->
                     <div class="row poll-name-block">
                       <div class="col-lg-12 d-flex flex-column">
                           <label class="createpage-label" for="createpage-poll-name">Name your poll</label>
-                          <input id="createpage-poll-name" type="text">
+                          <input name="poll_name" id="createpage-poll-name" type="text">
                       </div>
                     </div>
 
@@ -271,19 +332,19 @@
                       <div class="row">
                         <div class="col-lg-4 col-md-12 d-flex justify-content-center">
                           <label class="type-container-checkbox">
-                            <input type="radio" name="radio">
+                            <input name="poll_type" type="radio" value="Single choice">
                             <span class="checkmark"><img src="img/dot.svg" alt=""> Single choice</span>
                           </label>
                         </div>
                         <div class="col-lg-4 col-md-12 d-flex justify-content-center">
                           <label class="type-container-checkbox">
-                            <input type="radio" name="radio">
+                            <input name="poll_type" type="radio" name="radio" value="Dropdown list">
                             <span class="checkmark"><img src="img/down-arrow-decoration.svg" alt=""> Dropdown list</span>
                           </label>
                         </div>
                         <div class="col-lg-4 col-md-12 d-flex justify-content-center">
                           <label class="type-container-checkbox">
-                            <input type="radio" name="radio">
+                            <input name="poll_type" type="radio" name="radio" value="Multiple choice">
                             <span class="checkmark"><img src="img/checkmark.svg" alt=""> Multiple choice</span>
                           </label>
                         </div> 
@@ -293,61 +354,60 @@
                     {{-- Счётчик количества вопросов --}}
                     <input type="hidden" id="counter" name="questions_count" value="1"> <!-- Новое -->
                     <!--Text of question-->
-            <div id="app1">
-                <div v-for="id in ids" class="form-group">
-                    <div class="row poll-text-block">
-                      <div class="col-lg-12 d-flex flex-column">
-                          <label class="createpage-label" for="">Question #@{{ id.id }}</label>
-                          <label class="createpage-label" for="">Text of question</label>
-                          <textarea name="" id="" cols="5" rows="5"></textarea>
-                      </div>
-                    </div>
+                    <div id="app1">
+                        <div v-for="id in ids" class="form-group">
+                            <div class="row poll-text-block">
+                              <div class="col-lg-12 d-flex flex-column">
+                                  <label class="createpage-label" for="">Question #@{{ id.id }}</label>
+                                  <label class="createpage-label" for="">Text of question</label>
+                                  <textarea name="poll_question" id="" cols="5" rows="5"></textarea>
+                              </div>
+                            </div>
 
-                    <!--Answer choices-->
-                    <div class="poll-answer-choice-block">
-                      <label class="createpage-label" for="">Answer choices</label>
-                      <div class="row">
-                          <div class="col-lg-4 col-md-12 d-flex flex-column">
-                              <button class="takeImg"><img src="img/camera.svg" alt="Camera"></button>
-                              <button class="closeBlock"><img src="img/close.svg" alt="CloseIt"></button>
-                              <input class="default-input" type="text" placeholder="Enter answer">
-                              <label for="file-upload" class="custom-file-upload">
-                                <div class="d-flex flex-column align-items-center dashed-border">
-                                    <span>Image 1</span>
-                                    <p>Upload image</p>
+                            <!--Answer choices-->
+                            <div class="poll-answer-choice-block">
+                              <label class="createpage-label" for="">Answer choices</label>
+                              <div class="row">
+                                  <div class="col-lg-4 col-md-12 d-flex flex-column">
+                                      <button class="takeImg"><img src="img/camera.svg" alt="Camera"></button>
+                                      <button class="closeBlock"><img src="img/close.svg" alt="CloseIt"></button>
+                                      <input name="poll_answers" class="default-input" type="text" value="poll_answers" placeholder="Enter answer">
+                                      <label for="file-upload" class="custom-file-upload">
+                                        <div class="d-flex flex-column align-items-center dashed-border">
+                                            <span>Image 1</span>
+                                            <p>Upload image</p>
+                                        </div>
+                                      </label>
+                                      <input id="file-upload" type="file">
+                                  </div>
+                                  <div class="col-lg-4 col-md-12 d-flex flex-column">
+                                      <input class="default-input" type="text" placeholder="Enter answer">
+                                      <label for="file-upload" class="custom-file-upload">
+                                        <div class="d-flex flex-column align-items-center dashed-border">
+                                            <span>Image 1</span>
+                                            <p>Upload image</p>
+                                        </div>
+                                      </label>
+                                      <input id="file-upload" type="file">
+                                  </div>
+                                  <div class="col-lg-4 col-md-12 d-flex flex-column">
+                                      <input class="default-input" type="text" placeholder="Enter answer">
+                                      <label for="file-upload" class="custom-file-upload">
+                                        <div class="d-flex flex-column align-items-center dashed-border">
+                                            <span>Image 1</span>
+                                            <p>Upload image</p>
+                                        </div>
+                                      </label>
+                                      <input id="file-upload" type="file">
+                                  </div>
+                              </div>
+                              <!-- <div class="d-flex justify-content-center">
+                                <div onclick="app1.addNewEntry()" class="add-question-btn">Add more questions</div>
+                                    <button>Add more questions</button>
                                 </div>
-                              </label>
-                              <input id="file-upload" type="file">
-                          </div>
-                          <div class="col-lg-4 col-md-12 d-flex flex-column">
-                              <input class="default-input" type="text" placeholder="Enter answer">
-                              
-                              <label for="file-upload" class="custom-file-upload">
-                                <div class="d-flex flex-column align-items-center dashed-border">
-                                    <span>Image 1</span>
-                                    <p>Upload image</p>
-                                </div>
-                              </label>
-                              <input id="file-upload" type="file">
-                          </div>
-                          <div class="col-lg-4 col-md-12 d-flex flex-column">
-                              <input class="default-input" type="text" placeholder="Enter answer">
-                              <label for="file-upload" class="custom-file-upload">
-                                <div class="d-flex flex-column align-items-center dashed-border">
-                                    <span>Image 1</span>
-                                    <p>Upload image</p>
-                                </div>
-                              </label>
-                              <input id="file-upload" type="file">
-                          </div>
-                      </div>
-                      <!-- <div class="d-flex justify-content-center">
-                        <div onclick="app1.addNewEntry()" class="add-question-btn">Add more questions</div>
-                            <button>Add more questions</button>
+                            </div> -->
                         </div>
-                    </div> -->
-                </div>
-            </div>
+                    </div>
                 
             {{-- + button --}}
                     <div class="d-flex justify-content-center">
@@ -362,7 +422,7 @@
                       <div class="col-lg-4 col-md-6 d-flex flex-column">
                         <label class="createpage-label" for="">Audience category</label>
                         <div class="select-style">
-                          <select>
+                          <select name="poll_audience">
                             <option>Woman 30-40</option>
                             <option>Woman 40-50</option>
                             <option>Man 30-40</option>
@@ -376,14 +436,14 @@
                         <div class="d-flex">
                             <div>
                                 <label class="type-container-checkbox">
-                                  <input type="radio" name="radio2">
+                                  <input type="radio" name="poll_audience_gender" value="Male">
                                   <span class="checkmark">
                                   <img src="img/male.svg" alt=""> Male</span>
                                 </label>
                             </div>
                             <div>
                               <label class="type-container-checkbox">
-                                <input type="radio" name="radio2">
+                                <input type="radio" name="poll_audience_gender" value="Female">
                                 <span class="checkmark"><img src="img/female.svg" alt=""> Female</span>
                               </label>
                             </div>
@@ -394,7 +454,7 @@
                         <label class="createpage-label" for="">Audience age</label>
                         <div class="d-flex">
                           <div class="select-style-min">
-                            <select>
+                            <select name="poll_audience_age_from">
                               <option>20</option>
                               <option>30</option>
                               <option>40</option>
@@ -402,7 +462,7 @@
                             </select>
                           </div>
                           <div class="select-style-min">
-                            <select>
+                            <select name="poll_audience_age_to">
                               <option>20</option>
                               <option>30</option>
                               <option>40</option>
@@ -418,7 +478,7 @@
                       <div class="col-lg-4 col-md-6 col-sm-4 col-12 d-flex flex-column">
                         <label class="createpage-label" for="">Location</label>
                         <div class="select-style">
-                          <select>
+                          <select name="poll_audience_location">
                             <option>Armenia</option>
                             <option>Algeria</option>
                             <option>France</option>
@@ -433,6 +493,7 @@
                       <p>Total cost: <span><strong id="total-cost">1</strong>$</span> </p>
                       <button type="submit">Create poll</button>
                     </div>
+                  
 
                   </div>
                 </form>
