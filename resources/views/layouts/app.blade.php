@@ -37,9 +37,15 @@
 
           <!--Desktop auth block-->
           <div class="col-3 justify-content-end auth-block d-none d-lg-block">
+            @if(Auth::user())
+            <a href="{{ url('/logout') }}">
+              <button class="login-btn">Logout</button>
+            </a>
+            @else
             <a href="{{ url('/login') }}">
               <button class="login-btn">Log in</button>
             </a>
+            @endif
             <a href="#">
               <button class="register-btn">Sign up</button>
             </a>

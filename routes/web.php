@@ -12,10 +12,19 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('login');
 });
-Route::get('/index', 'MainController@index');
-Route::get('/login', 'MainController@login');
-Route::get('/plans', 'MainController@plans');
+
+Auth::routes();
+
+//'middleware' => 'auth'
+Route::group(['middleware' => 'auth'],function() {
+	Route::get('/index', 'MainController@index');
+	Route::get('/plans', 'MainController@plans');
+
+});
 
 
+Route::get('/logout', '\App\Http\Controllers\Auth\LoginController@logout');
+
+Route::get('/home', 'HomeController@index')->name('home');
